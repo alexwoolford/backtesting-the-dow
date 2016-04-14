@@ -61,4 +61,6 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 
-backtesting_the_dow.cfg
+.idea/
+
+collect_intraday.cfg
