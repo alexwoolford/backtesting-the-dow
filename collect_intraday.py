@@ -14,19 +14,20 @@ class CollectIntraday:
         config.read('collect_intraday.cfg')
 
         # MySQL
-        self.mysql_user = config.get('mysql', 'user')
-        self.mysql_password = config.get('mysql', 'password')
-        self.mysql_host = config.get('mysql', 'host')
-        self.mysql_port = config.get('mysql', 'port')
+        mysql_user = config.get('mysql', 'user')
+        mysql_password = config.get('mysql', 'password')
+        mysql_host = config.get('mysql', 'host')
+        mysql_port = config.get('mysql', 'port')
         self.mysql_database = config.get('mysql', 'database')
+
+        self.mysql_connection = mysql.connector.connect(user=mysql_user,
+                                                        password=mysql_password,
+                                                        host=mysql_host,
+                                                        database=self.mysql_database,
+                                                        port=mysql_port)
 
     def get_intraday_data(self, ticker, interval_seconds=61, num_days=60):
         # Credit to http://www.theodor.io/scraping-google-finance-data-using-pandas/
-        mysql_connection = mysql.connector.connect(user=self.mysql_user,
-                                                   password=self.mysql_password,
-                                                   host=self.mysql_host,
-                                                   database=self.mysql_database,
-                                                   port=self.mysql_port)
 
         # Specify URL string based on function inputs.
         url_string = "http://www.google.com/finance/getprices?q={0}&i={1}&p={2}d&f=d,o,h,l,c,v".format(ticker, interval_seconds, num_days)
@@ -45,11 +46,23 @@ class CollectIntraday:
 
         df['ticker'] = ticker
 
-        df.to_sql("intra_day_schx", mysql_connection, flavor='mysql', schema=self.mysql_database, if_exists='append',
+        df.to_sql("intra_day", self.mysql_connection, flavor='mysql', schema=self.mysql_database, if_exists='append',
                   index=False, index_label=None, chunksize=None, dtype=None)
 
+    def get_tickers(self):
+        cursor = self.mysql_connection.cursor()
+        cursor.execute("SELECT ticker FROM tickers")
+
+        tickers = [ticker[0] for ticker in cursor.fetchall()]
+
+        return tickers
+
+    def run(self):
+        tickers = self.get_tickers()
+        for ticker in tickers:
+            self.get_intraday_data(ticker)
 
 if __name__ == "__main__":
     collectIntraday = CollectIntraday()
-    collectIntraday.get_intraday_data("SCHX")
+    collectIntraday.run()
     del collectIntraday
