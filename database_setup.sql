@@ -7,11 +7,13 @@ CREATE TABLE tickers (
 );
 
 CREATE TABLE intra_day (
-  `Datetime` datetime,
-  `Close` VARCHAR(63),
-  `High` VARCHAR(63),
-  `Low` VARCHAR(63),
-  `Open` VARCHAR(63),
-  `Volume` VARCHAR(63),
+  `datetime` datetime,
+  `close` FLOAT,
+  `high` FLOAT,
+  `low` FLOAT,
+  `open` FLOAT,
+  `volume` BIGINT,
   `ticker` VARCHAR(63)
 );
+
+INSERT INTO tickers (ticker) VALUES ('SCHX');
