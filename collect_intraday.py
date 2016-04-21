@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import logging
-import ConfigParser
+from jproperties import Properties
 import mysql.connector
 import requests
 import pandas as pd
@@ -18,18 +18,19 @@ logging.basicConfig(level=logging.INFO,
 class CollectIntraday:
 
     def __init__(self):
-        config_file_name = 'collect_intraday.cfg'
+        config_file_name = 'backtesting_the_dow.properties'
         try:
             # Read properties
-            config = ConfigParser.RawConfigParser()
-            config.read(config_file_name)
+            properties = Properties()
+            with open(config_file_name, "rb") as f:
+                properties.load(f, "utf-8")
 
             # MySQL
-            self.mysql_user = config.get('mysql', 'user')
-            self.mysql_password = config.get('mysql', 'password')
-            self.mysql_host = config.get('mysql', 'host')
-            self.mysql_port = config.get('mysql', 'port')
-            self.mysql_database = config.get('mysql', 'database')
+            self.mysql_user = properties.properties['mysql.user']
+            self.mysql_password = properties.properties['mysql.password']
+            self.mysql_host = properties.properties['mysql.host']
+            self.mysql_port = properties.properties['mysql.port']
+            self.mysql_database = properties.properties['mysql.database']
         except:
             logging.error("Error reading config file {0}: {1}".format(config_file_name, str(sys.exc_info())))
             sys.exit(1)

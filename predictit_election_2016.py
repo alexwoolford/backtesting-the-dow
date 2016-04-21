@@ -2,7 +2,7 @@
 
 import requests
 import json
-import ConfigParser
+from jproperties import Properties
 import mysql.connector
 
 
@@ -20,18 +20,20 @@ class ElectionPredictItTrend:
     """
 
     def __init__(self):
-        config_file_name = 'collect_intraday.cfg'
-        config = ConfigParser.RawConfigParser()
-        config.read(config_file_name)
+        # Read properties
+        config_file_name = 'backtesting_the_dow.properties'
+        properties = Properties()
+        with open(config_file_name, "rb") as f:
+            properties.load(f, "utf-8")
 
         self.base_url = "https://www.predictit.org/api/marketdata/ticker/"
 
         # MySQL
-        self.mysql_user = config.get('mysql', 'user')
-        self.mysql_password = config.get('mysql', 'password')
-        self.mysql_host = config.get('mysql', 'host')
-        self.mysql_port = config.get('mysql', 'port')
-        self.mysql_database = config.get('mysql', 'database')
+        self.mysql_user = properties.properties['mysql.user']
+        self.mysql_password = properties.properties['mysql.password']
+        self.mysql_host = properties.properties['mysql.host']
+        self.mysql_port = properties.properties['mysql.port']
+        self.mysql_database = properties.properties['mysql.database']
 
         self.mysql_connection = mysql.connector.connect(user=self.mysql_user,
                                                         password=self.mysql_password,

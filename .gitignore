@@ -63,4 +63,4 @@ target/
 
 .idea/
 
-collect_intraday.cfg
+backtesting_the_dow.properties
