@@ -70,12 +70,24 @@ class CollectIntraday:
 
             df['ticker'] = ticker
 
-            df.to_sql("intra_day",
+            df.to_sql("intra_day_temp",
                       self.mysql_connection,
                       flavor='mysql',
                       schema=self.mysql_database,
-                      if_exists='append',
+                      if_exists='replace',
                       index=False)
+
+            mysql_cursor = self.mysql_connection.cursor()
+            sql = "INSERT INTO intra_day "                   \
+                  "SELECT * FROM intra_day_temp "            \
+                  "ON DUPLICATE KEY UPDATE "                 \
+                  "  intra_day.close=intra_day_temp.close, " \
+                  "  intra_day.high=intra_day_temp.high, "   \
+                  "  intra_day.low=intra_day_temp.low, "     \
+                  "  intra_day.open=intra_day_temp.open, "   \
+                  "  intra_day.volume=intra_day_temp.volume"
+            mysql_cursor.execute(sql)
+            mysql_cursor.execute('DROP TABLE intra_day_temp')
 
             logging.info("Collected {0} rows for ticker {1}".format(len(df.index), ticker))
 
