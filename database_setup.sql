@@ -17,6 +17,14 @@ CREATE TABLE intra_day (
   UNIQUE KEY intra_day_snapshot_key (`datetime`, `ticker`)
 );
 
+CREATE TABLE scenario_outcome (
+    transaction_cost FLOAT,
+    transaction_size INTEGER,
+    fall_trigger_percentage FLOAT,
+    climb_trigger_percentage FLOAT,
+    percentage_change DOUBLE
+);
+
 INSERT INTO tickers (ticker) VALUES ('SCHX');
 
 CREATE TABLE predictit_prices (
