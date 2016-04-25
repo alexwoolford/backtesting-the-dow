@@ -43,83 +43,87 @@ class BackTest:
                      transaction_size,
                      fall_trigger_percent,
                      climb_trigger_percent):
+        try:
+            mysql_connection = mysql.connector.connect(user=self.mysql_user,
+                                                       password=self.mysql_password,
+                                                       host=self.mysql_host,
+                                                       database=self.mysql_database,
+                                                       port=self.mysql_port)
+            logging.debug("Connected to MySQL")
 
-        mysql_connection = mysql.connector.connect(user=self.mysql_user,
-                                                   password=self.mysql_password,
-                                                   host=self.mysql_host,
-                                                   database=self.mysql_database,
-                                                   port=self.mysql_port)
-        logging.debug("Connected to MySQL")
+            cursor = mysql_connection.cursor(cursor_class=MySQLCursorDict)
+            logging.debug("Created MySQL cursor.")
 
-        cursor = mysql_connection.cursor(cursor_class=MySQLCursorDict)
-        logging.debug("Created MySQL cursor.")
+            sql = "SELECT datetime, open FROM intra_day ORDER BY datetime"
+            cursor.execute(sql)
+            logging.debug("Executed SQL: " + sql)
 
-        sql = "SELECT datetime, open FROM intra_day ORDER BY datetime"
-        cursor.execute(sql)
-        logging.debug("Executed SQL: " + sql)
+            records = cursor.fetchall()
+            logging.debug("Fetched " + str(len(records)) + " records.")
 
-        records = cursor.fetchall()
-        logging.debug("Fetched " + str(len(records)) + " records.")
+            last_transacted_price = records[0]['open']
+            initial_portfolio_value = cash + shares * last_transacted_price
+            portfolio_value = initial_portfolio_value
 
-        last_transacted_price = records[0]['open']
-        initial_portfolio_value = cash + shares * last_transacted_price
+            for record in records:
 
-        for record in records:
+                current_price = record['open']
+                datetime = record['datetime']
+                price_change_percent = (current_price - last_transacted_price) / last_transacted_price
 
-            current_price = record['open']
-            datetime = record['datetime']
-            price_change_percent = (current_price - last_transacted_price) / last_transacted_price
+                # should we try to buy or sell?
+                transaction = None
+                if price_change_percent > 0 and price_change_percent > climb_trigger_percent:
+                    # try and sell
+                    if shares > transaction_size:
+                        cash -= transaction_cost
+                        cash += transaction_size * current_price
+                        shares = shares - transaction_size
 
-            # should we try to buy or sell?
-            transaction = None
-            if price_change_percent > 0 and price_change_percent > climb_trigger_percent:
-                # try and sell
-                if shares > transaction_size:
-                    cash -= transaction_cost
-                    cash += transaction_size * current_price
-                    shares = shares - transaction_size
+                        last_transacted_price = current_price
+                        transaction = "sell"
 
-                    last_transacted_price = current_price
-                    transaction = "sell"
+                elif price_change_percent < 0 and abs(price_change_percent) > fall_trigger_percent:
+                    # try and buy
+                    if cash - transaction_cost > current_price * transaction_size:
+                        cash -= transaction_cost
+                        cash -= transaction_size * current_price
+                        shares += transaction_size
 
-            elif price_change_percent < 0 and abs(price_change_percent) > fall_trigger_percent:
-                # try and buy
-                if cash - transaction_cost > current_price * transaction_size:
-                    cash -= transaction_cost
-                    cash -= transaction_size * current_price
-                    shares += transaction_size
+                        last_transacted_price = current_price
+                        transaction = "buy"
 
-                    last_transacted_price = current_price
-                    transaction = "buy"
+                if transaction:
+                    portfolio_value = cash + (shares * last_transacted_price)
+                    logging.debug("Transaction: {0} executed on {1}, {2} shares at {3}. Balance: shares={4}; cash={5}; portfolio value={6}".format(
+                        transaction,
+                        datetime,
+                        transaction_size,
+                        current_price,
+                        shares,
+                        cash,
+                        portfolio_value))
 
-            if transaction:
-                portfolio_value = cash + (shares * last_transacted_price)
-                logging.debug("Transaction: {0} executed on {1}, {2} shares at {3}. Balance: shares={4}; cash={5}; portfolio value={6}".format(
-                    transaction,
-                    datetime,
-                    transaction_size,
-                    current_price,
-                    shares,
-                    cash,
-                    portfolio_value))
+                percentage_change = (portfolio_value - initial_portfolio_value) / initial_portfolio_value
+                logging.info("percentage change: {0}".format(percentage_change))
 
-        percentage_change = (portfolio_value - initial_portfolio_value) / initial_portfolio_value
-        logging.info("percentage change: {0}".format(percentage_change))
+                sql = "INSERT INTO scenario_outcome " \
+                      "    (transaction_cost, transaction_size, fall_trigger_percentage, climb_trigger_percentage, percentage_change) " \
+                      "VALUES ({0}, {1}, {2}, {3}, {4})".format(transaction_cost,
+                                                                transaction_size,
+                                                                fall_trigger_percentage,
+                                                                climb_trigger_percentage,
+                                                                percentage_change)
+                logging.debug("sql: " + sql)
+                cursor.execute(sql)
+                cursor.execute('commit')
+                logging.debug("Saved scenario outcome to MySQL.")
 
-        sql = "INSERT INTO scenario_outcome " \
-              "    (transaction_cost, transaction_size, fall_trigger_percentage, climb_trigger_percentage, percentage_change) " \
-              "VALUES ({0}, {1}, {2}, {3}, {4})".format(transaction_cost,
-                                                        transaction_size,
-                                                        fall_trigger_percentage,
-                                                        climb_trigger_percentage,
-                                                        percentage_change)
-        logging.debug("sql: " + sql)
-        cursor.execute(sql)
-        cursor.execute('commit')
-        logging.debug("Saved scenario outcome to MySQL.")
+                mysql_connection.close()
+                logging.debug("Closed MySQL connection.")
 
-        mysql_connection.close()
-        logging.debug("Closed MySQL connection.")
+        except:
+            logging.error("error running scenario {0}, ".format(str(sys.exc_info())))
 
     @staticmethod
     def get_scenarios():
