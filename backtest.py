@@ -104,23 +104,23 @@ class BackTest:
                         cash,
                         portfolio_value))
 
-                percentage_change = (portfolio_value - initial_portfolio_value) / initial_portfolio_value
-                logging.info("percentage change: {0}".format(percentage_change))
+            percentage_change = (portfolio_value - initial_portfolio_value) / initial_portfolio_value
+            logging.info("percentage change: {0}".format(percentage_change))
 
-                sql = "INSERT INTO scenario_outcome " \
-                      "    (transaction_cost, transaction_size, fall_trigger_percentage, climb_trigger_percentage, percentage_change) " \
-                      "VALUES ({0}, {1}, {2}, {3}, {4})".format(transaction_cost,
-                                                                transaction_size,
-                                                                fall_trigger_percentage,
-                                                                climb_trigger_percentage,
-                                                                percentage_change)
-                logging.debug("sql: " + sql)
-                cursor.execute(sql)
-                cursor.execute('commit')
-                logging.debug("Saved scenario outcome to MySQL.")
+            sql = "INSERT INTO scenario_outcome " \
+                  "    (transaction_cost, transaction_size, fall_trigger_percentage, climb_trigger_percentage, percentage_change) " \
+                  "VALUES ({0}, {1}, {2}, {3}, {4})".format(transaction_cost,
+                                                            transaction_size,
+                                                            fall_trigger_percentage,
+                                                            climb_trigger_percentage,
+                                                            percentage_change)
+            logging.debug("sql: " + sql)
+            cursor.execute(sql)
+            cursor.execute('commit')
+            logging.debug("Saved scenario outcome to MySQL.")
 
-                mysql_connection.close()
-                logging.debug("Closed MySQL connection.")
+            mysql_connection.close()
+            logging.debug("Closed MySQL connection.")
 
         except:
             logging.error("error running scenario {0}, ".format(str(sys.exc_info())))
@@ -141,6 +141,7 @@ if __name__ == "__main__":
     backTest = BackTest()
     for scenario in backTest.get_scenarios():
         transaction_cost, transaction_size, fall_trigger_percentage, climb_trigger_percentage = scenario
+
         backTest.run_scenario(cash=1000,                                        # initial condition
                               shares=10,                                        # initial condition
                               transaction_cost=transaction_cost,                # scenario parameter
