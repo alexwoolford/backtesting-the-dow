@@ -1,8 +1,10 @@
 ## Backtesting the Dow
 
-My brother-in-law, Eric, and I were talking about investment strategies: specifically, if we buy when prices are fall and sell when prices climb, how much should the price change between transactions to maximize yield?
+My brother-in-law, Eric, and I were talking about investment strategies: specifically, if we buy the Dow Jones when prices fall and sell when prices climb, how much should the price change between transactions to maximize yield?
 
-We collected some intra-day data for the SCHX ticker, which tracks the Dow Jones, between March 30th and April 22nd and backtested various scenarios. Obviously, three weeks of a single ticker is a very small sample. Our preliminary exploratory data analysis showed that the amount of price appreciation to trigger a sell, is an important factor. We backtested various scenarios and used the Random Forest importance function to identify the most influential parameters:
+We collected some intra-day data for the SCHX ticker, which tracks the Dow Jones, between March 30th and April 22nd and backtested various scenarios. Obviously, three weeks of a single ticker is a very small sample.
+
+We backtested various scenarios and used the Random Forest importance function to identify the most influential parameters:
 
                              IncNodePurity
     climb_trigger_percentage         0.168
