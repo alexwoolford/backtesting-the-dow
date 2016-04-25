@@ -1,7 +1,10 @@
 ## Backtesting the Dow
 
-My brother-in-law, Eric, and I were talking about investment. We decided to collect some intra-day data to backtest strategies. Once we have collected a reasonable data sample we'll build some simulations to help develop a more optimal investment strategy. So far, this code just collects the intra-day data. Simulation will follow shortly.
+My brother-in-law, Eric, and I were talking about investment. We decided to collect some intra-day data to backtest strategies. Here are some preliminary investment strategies:
 
+![climb trigger percent](climb_trigger_percent.png)
+
+![fall trigger percent](fall_trigger_percent.png)
 
 ## Prediction markets: 2016 election
 
