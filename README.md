@@ -4,7 +4,7 @@ My brother-in-law, Eric, and I were talking about investment strategies: specifi
 
 We collected some intra-day data for the SCHX ticker, which tracks the Dow Jones, between March 30th and April 22nd and backtested various scenarios. Obviously, three weeks of a single ticker is a very small sample.
 
-We backtested various scenarios and used the Random Forest importance function to identify the most influential parameters:
+We then used the Random Forest importance function to identify the most influential parameters:
 
                              IncNodePurity
     climb_trigger_percentage         0.168
