@@ -128,10 +128,10 @@ class BackTest:
     @staticmethod
     def get_scenarios():
 
-        transaction_costs = [5, 6, 7, 8, 9, 10]
-        transaction_sizes = [1, 2, 3, 4, 5, 6]
-        fall_trigger_percentages = [0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04]
-        climb_trigger_percentages = [0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04]
+        transaction_costs = xrange(5, 10, 0.5)
+        transaction_sizes = xrange(1, 10, 1)
+        fall_trigger_percentages = xrange(0.01, 0.1, 0.01)
+        climb_trigger_percentages = xrange(0.01, 0.1, 0.01)
 
         scenario_lists = [transaction_costs, transaction_sizes, fall_trigger_percentages, climb_trigger_percentages]
 
