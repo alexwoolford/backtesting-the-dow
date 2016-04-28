@@ -33,3 +33,16 @@ CREATE TABLE predictit_prices (
   `last_trade_price` FLOAT,
   `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE scenario_outcome_fixed (
+transaction_cost float,
+transaction_size integer,
+fall_trigger float,
+climb_trigger float,
+sell_transaction_count integer,
+profit_per_transaction float,
+profit float
+)
+
+

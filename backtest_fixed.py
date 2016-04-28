@@ -10,7 +10,7 @@ import itertools
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
-                    filename='backtest.log',
+                    filename='backtest_fixed.log',
                     filemode='w')
 
 
@@ -41,8 +41,8 @@ class BackTest:
                      shares,
                      transaction_cost,
                      transaction_size,
-                     fall_trigger_percent,
-                     climb_trigger_percent):
+                     fall_trigger,
+                     climb_trigger):
         try:
             mysql_connection = mysql.connector.connect(user=self.mysql_user,
                                                        password=self.mysql_password,
@@ -64,16 +64,17 @@ class BackTest:
             last_transacted_price = records[0]['open']
             initial_portfolio_value = cash + shares * last_transacted_price
             portfolio_value = initial_portfolio_value
+            sell_transaction_count = 0
 
             for record in records:
 
                 current_price = record['open']
                 datetime = record['datetime']
-                price_change_percent = (current_price - last_transacted_price) / last_transacted_price
+                price_change = current_price - last_transacted_price
 
                 # should we try to buy or sell?
                 transaction = None
-                if price_change_percent > 0 and price_change_percent > climb_trigger_percent:
+                if price_change > 0 and price_change > climb_trigger:
                     # try and sell
                     if shares > transaction_size:
                         cash -= transaction_cost
@@ -82,8 +83,9 @@ class BackTest:
 
                         last_transacted_price = current_price
                         transaction = "sell"
+                        sell_transaction_count += 1
 
-                elif price_change_percent < 0 and abs(price_change_percent) > fall_trigger_percent:
+                elif price_change < 0 and abs(price_change) > fall_trigger:
                     # try and buy
                     if cash - transaction_cost > current_price * transaction_size:
                         cash -= transaction_cost
@@ -93,31 +95,17 @@ class BackTest:
                         last_transacted_price = current_price
                         transaction = "buy"
 
-                if transaction:
-                    portfolio_value = cash + (shares * last_transacted_price)
-                    logging.debug("Transaction: {0} executed on {1}, {2} shares at {3}. Balance: shares={4}; cash={5}; portfolio value={6}".format(
-                        transaction,
-                        datetime,
-                        transaction_size,
-                        current_price,
-                        shares,
-                        cash,
-                        portfolio_value))
 
-            percentage_change = (portfolio_value - initial_portfolio_value) / initial_portfolio_value
-            logging.info("percentage change: {0}".format(percentage_change))
+            profit_per_transaction = transaction_size * climb_trigger
+            profit = profit_per_transaction * sell_transaction_count
 
-            sql = "INSERT INTO scenario_outcome " \
-                  "    (transaction_cost, transaction_size, fall_trigger_percentage, climb_trigger_percentage, percentage_change) " \
-                  "VALUES ({0}, {1}, {2}, {3}, {4})".format(transaction_cost,
-                                                            transaction_size,
-                                                            fall_trigger_percentage,
-                                                            climb_trigger_percentage,
-                                                            percentage_change)
-            logging.debug("sql: " + sql)
+            logging.info("sells: {0}, profit: {1}".format(sell_transaction_count, profit))
+
+            sql = "INSERT INTO scenario_outcome_fixed (transaction_cost, transaction_size, fall_trigger, climb_trigger, sell_transaction_count, profit_per_transaction, profit) VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6})".format(transaction_cost, transaction_size, fall_trigger, climb_trigger, sell_transaction_count, profit_per_transaction, profit)
+
+            cursor = mysql_connection.cursor()
             cursor.execute(sql)
             cursor.execute('commit')
-            logging.debug("Saved scenario outcome to MySQL.")
 
             mysql_connection.close()
             logging.debug("Closed MySQL connection.")
@@ -129,23 +117,28 @@ class BackTest:
     def get_scenarios():
 
         transaction_costs = [0.05]
-        transaction_sizes = [46]
-        fall_trigger_percentages = [0.005, 0.010, 0.015, 0.020, 0.025, 0.030, 0.035, 0.040, 0.045, 0.050, 0.055, 0.060, 0.065, 0.075]
-        climb_trigger_percentages = [0.005, 0.010, 0.015, 0.020, 0.025, 0.030, 0.035, 0.040, 0.045, 0.050, 0.055, 0.060, 0.065, 0.075]
+        transaction_sizes = [20, 25, 30, 35, 40, 45, 50, 55, 60]
+        fall_trigger = [0.05, 0.06, 0.07, 0.08, 0.9, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22, 0.23, 0.24, 0.25]
+        climb_trigger = [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.4, 0.45, 0.5]
 
-        scenario_lists = [transaction_costs, transaction_sizes, fall_trigger_percentages, climb_trigger_percentages]
+        # transaction_costs = [0.05]
+        # transaction_sizes = [46]
+        # fall_trigger = [0.18]
+        # climb_trigger = [0.25]
+
+        scenario_lists = [transaction_costs, transaction_sizes, fall_trigger, climb_trigger]
 
         return list(itertools.product(*scenario_lists))
 
 if __name__ == "__main__":
     backTest = BackTest()
     for scenario in backTest.get_scenarios():
-        transaction_cost, transaction_size, fall_trigger_percentage, climb_trigger_percentage = scenario
+        transaction_cost, transaction_size, fall_trigger, climb_trigger = scenario
 
-        backTest.run_scenario(cash=17506,                                       # initial condition
-                              shares=598,                                       # initial condition
-                              transaction_cost=transaction_cost,                # scenario parameter
-                              transaction_size=transaction_size,                # scenario parameter
-                              fall_trigger_percent=fall_trigger_percentage,     # scenario parameter
-                              climb_trigger_percent=climb_trigger_percentage)   # scenario parameter
+        backTest.run_scenario(cash=100000,                                        # initial condition
+                              shares=1000,                                        # initial condition
+                              transaction_cost=transaction_cost,                 # scenario parameter
+                              transaction_size=transaction_size,                 # scenario parameter
+                              fall_trigger=fall_trigger,                         # scenario parameter
+                              climb_trigger=climb_trigger)                       # scenario parameter
     del backTest
