@@ -1,0 +1,5 @@
+db.username=mysql_user
+db.password=password123
+db.host=localhost
+db.port=3306
+db.schema=backtesting_the_dow
