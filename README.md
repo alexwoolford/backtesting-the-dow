@@ -9,17 +9,13 @@ The backtesting model is accessible via an API. Here's an example call:
     http://localhost:8080/scenario?ticker=schx&cash=20000&shares=100&transactionCost=0.05&transactionSize=1&fallTrigger=0.15&climbTrigger=0.15
 
 The (mandatory) input parameters are:
-
-    Initial conditions:
-    + cash: the initial amount of cash
-    + shares: the initial quantity of shares
-    + ticker: the stock symbol
-
-    Scenario parameters:
-    + transactionCost: this can vary widely according the the terms of your brokerage.
-    + transactionSize: the quantity of shares transacted on any given buy or sell.
-    + fallTrigger: the dollar amount the stock has to fall, from the previous transaction, to trigger a buy.
-    + climbTrigger: the dollar amount the stock has to climb, from the previous transaction, to trigger a sell.
++ cash: the initial amount of cash
++ shares: the initial quantity of shares
++ ticker: the stock symbol
++ transactionCost: this can vary widely according the the terms of your brokerage.
++ transactionSize: the quantity of shares transacted on any given buy or sell.
++ fallTrigger: the dollar amount the stock has to fall, from the previous transaction, to trigger a buy.
++ climbTrigger: the dollar amount the stock has to climb, from the previous transaction, to trigger a sell.
 
 The backtest runs the scenario, e.g. :
 
