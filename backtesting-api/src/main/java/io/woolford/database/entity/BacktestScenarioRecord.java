@@ -1,11 +1,15 @@
 package io.woolford.database.entity;
 
 
+import java.util.Date;
+
 public class BacktestScenarioRecord {
 
     private String ticker;
     private Double initialCash;
     private Integer initialShares;
+    private Date start;
+    private Date end;
     private Double transactionCost;
     private Integer transactionSize;
     private Double fallTrigger;
@@ -40,6 +44,22 @@ public class BacktestScenarioRecord {
 
     public void setInitialShares(Integer initialShares) {
         this.initialShares = initialShares;
+    }
+
+    public Date getStart() {
+        return start;
+    }
+
+    public void setStart(Date start) {
+        this.start = start;
+    }
+
+    public Date getEnd() {
+        return end;
+    }
+
+    public void setEnd(Date end) {
+        this.end = end;
     }
 
     public Double getTransactionCost() {
@@ -136,6 +156,8 @@ public class BacktestScenarioRecord {
                 "ticker='" + ticker + '\'' +
                 ", initialCash=" + initialCash +
                 ", initialShares=" + initialShares +
+                ", start=" + start +
+                ", end=" + end +
                 ", transactionCost=" + transactionCost +
                 ", transactionSize=" + transactionSize +
                 ", fallTrigger=" + fallTrigger +

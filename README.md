@@ -26,24 +26,24 @@ The backtest runs the scenario, e.g. :
     Buy 20 shares at 48.611 on Tue Apr 05 01:33:00 MDT 2016.
 
 The simulation results are returned as JSON:
-
     {
         "ticker": "schx",
         "initialCash": 20000.0,
         "initialShares": 100,
+        "start": 1459150200000,
+        "end": 1461938400000,
         "transactionCost": 0.05,
-        "transactionSize": 1,
-        "fallTrigger": 0.15,
+        "transactionSize": 20,
+        "fallTrigger": 0.5,
         "climbTrigger": 0.15,
         "initialPortfolioValue": 24832.0,
-        "sellTransactionCount": 35,
-        "buyTransactionCount": 31,
-        "finalCash": 20198.422,
-        "finalShares": 65,
-        "finalPortfolioValue": 23389.272,
-        "portfolioPercentageChange": -0.0580
+        "sellTransactionCount": 4,
+        "buyTransactionCount": 1,
+        "finalCash": 22932.3300,
+        "finalShares": 20,
+        "finalPortfolioValue": 23904.5500,
+        "portfolioPercentageChange": -0.0373
     }
-
 
 
 ## Prediction markets: 2016 election

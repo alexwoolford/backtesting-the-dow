@@ -6,6 +6,7 @@ import io.woolford.database.mapper.DbMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,6 +26,10 @@ public class BacktestTicker {
         BacktestScenarioRecord backtestScenarioRecord = new BacktestScenarioRecord();
         backtestScenarioRecord.setTicker(ticker);
         backtestScenarioRecord.setInitialCash(cash);
+
+        Date startDate = intraDayRecordList.get(0).getDatetime();
+        backtestScenarioRecord.setStart(startDate);
+
         backtestScenarioRecord.setInitialShares(shares);
         backtestScenarioRecord.setTransactionCost(transactionCost);
         backtestScenarioRecord.setTransactionSize(transactionSize);
@@ -66,6 +71,9 @@ public class BacktestTicker {
 
         }
 
+        Date end = intraDayRecordList.get(intraDayRecordList.size() - 1).getDatetime();
+        backtestScenarioRecord.setEnd(end);
+
         backtestScenarioRecord.setSellTransactionCount(sellTransactionCount);
         backtestScenarioRecord.setBuyTransactionCount(buyTransactionCount);
         backtestScenarioRecord.setFinalCash(cash);
@@ -76,6 +84,8 @@ public class BacktestTicker {
 
         Double portfolioPercentageChange = (finalPortfolioValue - initialPortfolioValue) / initialPortfolioValue;
         backtestScenarioRecord.setPortfolioPercentageChange(portfolioPercentageChange);
+
+        dbMapper.insertScenarioOutcome(backtestScenarioRecord);
 
         return backtestScenarioRecord;
 
