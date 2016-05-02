@@ -24,7 +24,7 @@ public class BacktestTicker {
         List<IntraDayRecord> intraDayRecordList = dbMapper.getIntraDayForTicker(ticker.toUpperCase());
 
         BacktestScenarioRecord backtestScenarioRecord = new BacktestScenarioRecord();
-        backtestScenarioRecord.setTicker(ticker);
+        backtestScenarioRecord.setTicker(ticker.toUpperCase());
         backtestScenarioRecord.setInitialCash(cash);
 
         Date startDate = intraDayRecordList.get(0).getDatetime();
@@ -64,6 +64,7 @@ public class BacktestTicker {
                     logger.info("Buy " + transactionSize + " shares at " + intraDayRecord.getOpen() + " on " + intraDayRecord.getDatetime() + ".");
                     lastTransactedPrice = intraDayRecord.getOpen();
                     buyTransactionCount++;
+                    shares += transactionSize;
                     cash -= transactionCost;
                     cash -= transactionSize * intraDayRecord.getOpen();
                 }
@@ -86,6 +87,8 @@ public class BacktestTicker {
         backtestScenarioRecord.setPortfolioPercentageChange(portfolioPercentageChange);
 
         dbMapper.insertScenarioOutcome(backtestScenarioRecord);
+
+        logger.info("backtestScenarioRecord: " + backtestScenarioRecord.toString());
 
         return backtestScenarioRecord;
 
