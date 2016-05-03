@@ -1,7 +1,7 @@
 package io.woolford;
 
 import io.woolford.database.entity.BacktestScenarioRecord;
-import io.woolford.database.entity.IntraDayRecord;
+import io.woolford.database.entity.IntradayRecord;
 import io.woolford.database.mapper.DbMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,13 +21,13 @@ public class BacktestTicker {
 
     public BacktestScenarioRecord backtest(String ticker, Double cash, Integer shares, Double transactionCost, Integer transactionSize, Double fallTrigger, Double climbTrigger){
 
-        List<IntraDayRecord> intraDayRecordList = dbMapper.getIntraDayForTicker(ticker.toUpperCase());
+        List<IntradayRecord> intradayRecordList = dbMapper.getIntraDayForTicker(ticker.toUpperCase());
 
         BacktestScenarioRecord backtestScenarioRecord = new BacktestScenarioRecord();
         backtestScenarioRecord.setTicker(ticker.toUpperCase());
         backtestScenarioRecord.setInitialCash(cash);
 
-        Date startDate = intraDayRecordList.get(0).getDatetime();
+        Date startDate = intradayRecordList.get(0).getDatetime();
         backtestScenarioRecord.setStart(startDate);
 
         backtestScenarioRecord.setInitialShares(shares);
@@ -36,7 +36,7 @@ public class BacktestTicker {
         backtestScenarioRecord.setFallTrigger(fallTrigger);
         backtestScenarioRecord.setClimbTrigger(climbTrigger);
 
-        Double lastTransactedPrice = intraDayRecordList.get(0).getOpen();
+        Double lastTransactedPrice = intradayRecordList.get(0).getOpen();
         Double initialPortfolioValue = shares * lastTransactedPrice + cash;
 
         backtestScenarioRecord.setInitialPortfolioValue(initialPortfolioValue);
@@ -44,35 +44,35 @@ public class BacktestTicker {
         Integer sellTransactionCount = 0;
         Integer buyTransactionCount = 0;
 
-        for (IntraDayRecord intraDayRecord : intraDayRecordList){
+        for (IntradayRecord intradayRecord : intradayRecordList){
 
-            if (intraDayRecord.getOpen() > lastTransactedPrice + climbTrigger){
+            if (intradayRecord.getOpen() > lastTransactedPrice + climbTrigger){
                 if (shares > transactionSize) {
                     // Sell
-                    logger.info("Sell " + transactionSize + " shares at " + intraDayRecord.getOpen() + " on " + intraDayRecord.getDatetime() + ".");
-                    lastTransactedPrice = intraDayRecord.getOpen();
+                    logger.info("Sell " + transactionSize + " shares at " + intradayRecord.getOpen() + " on " + intradayRecord.getDatetime() + ".");
+                    lastTransactedPrice = intradayRecord.getOpen();
                     sellTransactionCount++;
                     shares -= transactionSize;
                     cash -= transactionCost;
-                    cash += transactionSize * intraDayRecord.getOpen();
+                    cash += transactionSize * intradayRecord.getOpen();
                 }
             }
 
-            if (intraDayRecord.getOpen() < lastTransactedPrice - fallTrigger){
-                if (cash - transactionCost > transactionSize * intraDayRecord.getOpen()){
+            if (intradayRecord.getOpen() < lastTransactedPrice - fallTrigger){
+                if (cash - transactionCost > transactionSize * intradayRecord.getOpen()){
                     // Buy
-                    logger.info("Buy " + transactionSize + " shares at " + intraDayRecord.getOpen() + " on " + intraDayRecord.getDatetime() + ".");
-                    lastTransactedPrice = intraDayRecord.getOpen();
+                    logger.info("Buy " + transactionSize + " shares at " + intradayRecord.getOpen() + " on " + intradayRecord.getDatetime() + ".");
+                    lastTransactedPrice = intradayRecord.getOpen();
                     buyTransactionCount++;
                     shares += transactionSize;
                     cash -= transactionCost;
-                    cash -= transactionSize * intraDayRecord.getOpen();
+                    cash -= transactionSize * intradayRecord.getOpen();
                 }
             }
 
         }
 
-        Date end = intraDayRecordList.get(intraDayRecordList.size() - 1).getDatetime();
+        Date end = intradayRecordList.get(intradayRecordList.size() - 1).getDatetime();
         backtestScenarioRecord.setEnd(end);
 
         backtestScenarioRecord.setSellTransactionCount(sellTransactionCount);

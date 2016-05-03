@@ -1,7 +1,8 @@
 package io.woolford.database.mapper;
 
 import io.woolford.database.entity.BacktestScenarioRecord;
-import io.woolford.database.entity.IntraDayRecord;
+import io.woolford.database.entity.IntradayRecord;
+import io.woolford.database.entity.TickerRecord;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,7 @@ public interface DbMapper {
             "FROM backtesting_the_dow.intra_day " +
             "WHERE ticker = #{ticker}           " +
             "ORDER BY datetime                  ")
-    public List<IntraDayRecord> getIntraDayForTicker(String ticker);
+    public List<IntradayRecord> getIntraDayForTicker(String ticker);
 
 
     @Insert("INSERT INTO backtesting_the_dow.scenario_outcome (ticker,                      " +
@@ -59,5 +60,15 @@ public interface DbMapper {
             "     #{finalPortfolioValue},       " +
             "     #{portfolioPercentageChange}) ")
     public void insertScenarioOutcome(BacktestScenarioRecord backtestScenarioRecord);
+
+    @Select("SELECT ticker FROM backtesting_the_dow.tickers ")
+    public List<TickerRecord> getTickers();
+
+    @Insert("INSERT INTO backtesting_the_dow.intra_day                                                        " +
+            "    (`datetime`, `close`, `high`, `low`, `open`, `volume`, `ticker`)                             " +
+            "VALUES                                                                                           " +
+            "    (#{datetime}, #{close}, #{high}, #{low}, #{open}, #{volume}, #{ticker})                      " +
+            "ON DUPLICATE KEY UPDATE close=#{close}, high=#{high}, low=#{low}, open=#{open}, volume=#{volume} ")
+    public void insertIntradayRecord(IntradayRecord intradayRecord);
 
 }

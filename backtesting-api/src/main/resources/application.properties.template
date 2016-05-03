@@ -1,5 +1,10 @@
+# MySQL
 db.username=mysql_user
 db.password=password123
 db.host=localhost
 db.port=3306
 db.schema=backtesting_the_dow
+
+# Google Finance
+google.finance.interval.seconds=61
+google.finance.num.days=30

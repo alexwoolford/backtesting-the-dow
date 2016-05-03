@@ -3,7 +3,7 @@ package io.woolford.database.entity;
 import java.math.BigInteger;
 import java.util.Date;
 
-public class IntraDayRecord {
+public class IntradayRecord {
 
     private Date datetime;
     private Double close;
@@ -71,7 +71,7 @@ public class IntraDayRecord {
 
     @Override
     public String toString() {
-        return "IntraDayRecord{" +
+        return "IntradayRecord{" +
                 "datetime=" + datetime +
                 ", close=" + close +
                 ", high=" + high +
