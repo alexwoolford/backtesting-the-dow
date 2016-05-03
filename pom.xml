@@ -10,5 +10,12 @@
         <module>backtesting-api</module>
         <module>migration</module>
     </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>1.3.3.RELEASE</version>
+        </dependency>
+    </dependencies>
 
 </project>
