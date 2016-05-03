@@ -6,7 +6,7 @@ We collected some intra-day data for the SCHX ticker, which tracks the Dow Jones
 
 The backtesting model is accessible via an API. Here's an example call:
 
-    http://localhost:8080/scenario?ticker=schx&cash=20000&shares=100&transactionCost=0.05&transactionSize=1&fallTrigger=0.15&climbTrigger=0.15
+    http://localhost:8080/scenario?ticker=schx&cash=20000&shares=100&transactionCost=0.05&transactionSize=30&fallTrigger=0.06&climbTrigger=0.05
 
 The (mandatory) input parameters are:
 + cash: the initial amount of cash
@@ -19,30 +19,33 @@ The (mandatory) input parameters are:
 
 The backtest runs the scenario, e.g. :
 
-    Sell 20 shares at 48.5 on Tue Mar 29 04:45:00 MDT 2016.
-    Sell 20 shares at 48.67 on Tue Mar 29 06:40:00 MDT 2016.
-    Sell 20 shares at 48.95 on Wed Mar 30 01:30:00 MDT 2016.
-    Sell 20 shares at 49.12 on Fri Apr 01 07:35:00 MDT 2016.
-    Buy 20 shares at 48.611 on Tue Apr 05 01:33:00 MDT 2016.
+    Buy 30 shares at 48.23 on Mon Mar 28 01:40:00 MDT 2016.
+    Buy 30 shares at 48.16 on Mon Mar 28 02:39:00 MDT 2016.
+    Sell 30 shares at 48.22 on Mon Mar 28 03:52:00 MDT 2016.
+    Sell 30 shares at 48.31 on Mon Mar 28 04:40:00 MDT 2016.
+    Sell 30 shares at 48.37 on Mon Mar 28 06:07:00 MDT 2016.
+    Buy 30 shares at 48.281 on Mon Mar 28 06:34:00 MDT 2016.
+    etc...
 
 The simulation results are returned as JSON:
+
     {
-        "ticker": "schx",
-        "initialCash": 20000.0,
-        "initialShares": 100,
-        "start": 1459150200000,
-        "end": 1461938400000,
-        "transactionCost": 0.05,
-        "transactionSize": 20,
-        "fallTrigger": 0.5,
-        "climbTrigger": 0.15,
-        "initialPortfolioValue": 24832.0,
-        "sellTransactionCount": 4,
-        "buyTransactionCount": 1,
-        "finalCash": 22932.3300,
-        "finalShares": 20,
-        "finalPortfolioValue": 23904.5500,
-        "portfolioPercentageChange": -0.0373
+     	"ticker": "SCHX",
+    	"initialCash": 20000.0,
+    	"initialShares": 100,
+    	"start": 1459150200000,
+     	"end": 1461938400000,
+    	"transactionCost": 0.05,
+    	"transactionSize": 30,
+    	"fallTrigger": 0.06,
+    	"climbTrigger": 0.05,
+    	"initialPortfolioValue": 24832.0,
+    	"sellTransactionCount": 40,
+    	"buyTransactionCount": 37,
+    	"finalCash": 24466.810000000063,
+    	"finalShares": 10,
+    	"finalPortfolioValue": 24955.41000000006,
+    	"portfolioPercentageChange": 0.0049697970360849586
     }
 
 
