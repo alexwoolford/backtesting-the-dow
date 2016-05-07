@@ -132,9 +132,8 @@ class BackTest:
 
 if __name__ == "__main__":
     backTest = BackTest()
-    for scenario in backTest.get_scenarios():
+    for scenario in backTest.get_scenarios()[:100]:
         transaction_cost, transaction_size, fall_trigger, climb_trigger = scenario
-
         backTest.run_scenario(cash=100000,                                        # initial condition
                               shares=1000,                                        # initial condition
                               transaction_cost=transaction_cost,                 # scenario parameter

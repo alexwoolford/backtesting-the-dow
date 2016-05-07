@@ -23,7 +23,7 @@ public interface DbMapper {
             "FROM backtesting_the_dow.intra_day " +
             "WHERE ticker = #{ticker}           " +
             "ORDER BY datetime                  ")
-    public List<IntradayRecord> getIntraDayForTicker(String ticker);
+    public List<IntradayRecord> getIntradayForTicker(String ticker);
 
 
     @Insert("INSERT INTO backtesting_the_dow.scenario_outcome (ticker,                      " +

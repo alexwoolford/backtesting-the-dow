@@ -3,6 +3,7 @@
 import itertools
 import urllib
 import requests
+import datetime as datetime
 
 
 def get_scenarios():
@@ -37,11 +38,12 @@ def run_scenario(ticker,
                      'transactionSize': transaction_size,
                      'fallTrigger': fall_trigger,
                      'climbTrigger': climb_trigger}
-    url = 'http://localhost:8080/scenario?' + urllib.urlencode(scenario_dict)
+    url = 'http://localhost:8081/scenario?' + urllib.urlencode(scenario_dict)
     requests.get(url)
 
 if __name__ == "__main__":
-    for scenario in get_scenarios():
+    start_time = datetime.datetime.now()
+    for scenario in get_scenarios()[:10]:
         transaction_cost, transaction_size, fall_trigger, climb_trigger = scenario
         run_scenario(ticker='SCHX',
                      cash=100000,                                        # initial condition
@@ -50,3 +52,5 @@ if __name__ == "__main__":
                      transaction_size=transaction_size,                 # scenario parameter
                      fall_trigger=fall_trigger,                         # scenario parameter
                      climb_trigger=climb_trigger)                       # scenario parameter
+    end_time = datetime.datetime.now()
+    print "Duration: " + str(end_time - start_time)

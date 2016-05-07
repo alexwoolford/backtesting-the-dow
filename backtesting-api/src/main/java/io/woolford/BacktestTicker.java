@@ -21,7 +21,7 @@ public class BacktestTicker {
 
     public BacktestScenarioRecord backtest(String ticker, Double cash, Integer shares, Double transactionCost, Integer transactionSize, Double fallTrigger, Double climbTrigger){
 
-        List<IntradayRecord> intradayRecordList = dbMapper.getIntraDayForTicker(ticker.toUpperCase());
+        List<IntradayRecord> intradayRecordList = dbMapper.getIntradayForTicker(ticker.toUpperCase());
 
         BacktestScenarioRecord backtestScenarioRecord = new BacktestScenarioRecord();
         backtestScenarioRecord.setTicker(ticker.toUpperCase());
