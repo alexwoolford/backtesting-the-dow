@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
@@ -45,9 +46,9 @@ public class DataCollect {
         URIBuilder uriBuilder = new URIBuilder("http://www.google.com/finance/getprices");
         uriBuilder.addParameter("q", tickerRecord.getTicker());
         uriBuilder.addParameter("i", String.valueOf(googleFinanceIntervalSeconds));
-        uriBuilder.addParameter("p", String.valueOf(googleFinanceNumDays));
-        uriBuilder.addParameter("f", "d,o,h,l,c,v");
-
+//        uriBuilder.addParameter("p", String.valueOf(googleFinanceNumDays));
+//        uriBuilder.addParameter("f", "d,o,h,l,c,v");
+//        COLUMNS=DATE,CLOSE,HIGH,LOW,OPEN,VOLUME <- the columns are returned, unless otherwise specified, in this order
         URL url = uriBuilder.build().toURL();
 
         String response = new Scanner(url.openStream(), "UTF-8").useDelimiter("\\A").next();

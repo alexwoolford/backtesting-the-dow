@@ -9,4 +9,6 @@ backtesting_the_dow.properties
 application.properties
 
 *.iml
+.RData
+.Rhistory
 

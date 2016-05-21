@@ -8,6 +8,7 @@
  */
 
 import React, { Component, PropTypes } from 'react';
+import Fetch from 'react-fetch'
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ContentPage.scss';
 
