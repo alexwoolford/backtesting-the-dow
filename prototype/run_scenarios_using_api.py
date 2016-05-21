@@ -56,7 +56,7 @@ def run_scenario(ticker,
 
 if __name__ == "__main__":
     start_time = datetime.datetime.now()
-    for scenario in get_scenarios()[:10]:
+    for scenario in get_scenarios():
         transaction_cost, transaction_size, fall_trigger, climb_trigger = scenario
         run_scenario(ticker='SCHX',
                      cash=100000,                                        # initial condition

@@ -3,36 +3,26 @@ library(lubridate)
 library(ggplot2)
 library(scales)
 library(properties)
-library(randomForest)
-library(plyr)
+library(reshape2)
 
-properties <- read.properties(file = 'backtesting_the_dow.properties')
+properties <- read.properties(file = '/Users/awoolford/backtesting-the-dow/prototype/backtesting_the_dow.properties')
 
 con = dbConnect(MySQL(),
-                user=properties$mysql.user,
-                password=properties$mysql.password,
-                dbname=properties$mysql.database,
-                host=properties$mysql.host)
+user=properties$mysql.user,
+password=properties$mysql.password,
+dbname=properties$mysql.database,
+host=properties$mysql.host)
 
 data <- dbReadTable(con, "scenario_outcome")
 
-randomForestModel <- randomForest(data = data, percentage_change ~ transaction_cost + transaction_size + fall_trigger_percentage + climb_trigger_percentage)
+data$transaction_cost <- NULL
 
-importance_data <- importance(randomForestModel)
+qplot(climb_trigger, portfolio_percentage_change, data = data, geom = "line") +
+facet_grid(fall_trigger ~ transaction_size) +
+scale_y_continuous(label=percent) +
+scale_x_continuous(label=dollar) +
+theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+labs(x = "climb trigger", y = "portfolio % change", title = "SCHX backtest scenarios (Mar 28th, 2016 -> May 20th, 2016); column facet: transaction size; row facet: fall trigger")
 
-print(importance_data)
-
-
-climb_trigger_percentage_change <- ddply(subset(data, transaction_cost == 9), .(climb_trigger_percentage), summarize, mean_percentage_change = mean(percentage_change))
-
-qplot(climb_trigger_percentage, mean_percentage_change, data = climb_trigger_percentage_change, geom = "line") + scale_x_continuous(label=percent) + scale_y_continuous(label=percent)
-
-ggsave(file = "climb_trigger_percent.png", width = 8, height = 6)
-
-
-fall_trigger_percentage_change <- ddply(subset(data, transaction_cost == 9), .(fall_trigger_percentage), summarize, mean_percentage_change = mean(percentage_change))
-
-qplot(fall_trigger_percentage, mean_percentage_change, data = fall_trigger_percentage_change, geom = "line") + scale_x_continuous(label=percent) + scale_y_continuous(label=percent)
-
-ggsave(file = "fall_trigger_percent.png", width = 8, height = 6)
+ggsave("/Users/awoolford/scenario_outcome_fixed.pdf", height = 15, width = 50, limitsize=FALSE)
 
