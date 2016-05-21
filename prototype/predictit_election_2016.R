@@ -9,7 +9,7 @@ properties <- read.properties(file = 'backtesting_the_dow.properties')
 
 con = dbConnect(MySQL(),
                 user='awoolford',
-                password='***REMOVED***',
+                password='********',
                 dbname='backtesting_the_dow',
                 host='deepthought')
 
